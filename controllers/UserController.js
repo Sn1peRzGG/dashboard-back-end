@@ -15,13 +15,6 @@ export const register = async (req, res) => {
 		const salt = await bcrypt.genSalt(10)
 		const hash = await bcrypt.hash(password, salt)
 
-		// const doc = new UserModel({
-		// 	email: req.body.email,
-		// 	username: req.body.username,
-		// 	avatarUrl: req.body.avatarUrl,
-		// 	passwordHash: hash,
-		// })
-
 		const doc = new UserModel({
 			firstName: req.body.firstName,
 			lastName: req.body.lastName,
@@ -35,6 +28,12 @@ export const register = async (req, res) => {
 
 		const token = jwt.sign({ _id: user._id, role: user.role }, 'secret123', {
 			expiresIn: '30d',
+		})
+
+		res.cookie('token', token, {
+			httpOnly: true,
+			secure: true,
+			maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
 		})
 
 		const { passwordHash, ...userData } = user._doc
@@ -65,6 +64,12 @@ export const login = async (req, res) => {
 
 		const token = jwt.sign({ _id: user._id, role: user.role }, 'secret123', {
 			expiresIn: '30d',
+		})
+
+		res.cookie('token', token, {
+			httpOnly: true,
+			secure: true,
+			maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
 		})
 
 		const { passwordHash, ...userData } = user._doc
