@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken'
 
+const JWT_SECRET = process.env.JWT_SECRET
+
 const checkAuth = (req, res, next) => {
 	const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
 
@@ -10,7 +12,7 @@ const checkAuth = (req, res, next) => {
 	}
 
 	try {
-		const decoded = jwt.verify(token, 'secret123')
+		const decoded = jwt.verify(token, JWT_SECRET)
 		req.userData = decoded
 		next()
 	} catch (error) {

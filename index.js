@@ -1,4 +1,5 @@
 import cors from 'cors'
+import 'dotenv/config'
 import express from 'express'
 import mongoose from 'mongoose'
 import * as UserController from './controllers/UserController.js'
@@ -7,7 +8,7 @@ import { loginValidation, registerValidation } from './validations.js'
 
 mongoose
 	.connect(
-		'mongodb+srv://admin:0000@users.huhlc6e.mongodb.net/?retryWrites=true&w=majority&appName=users'
+		`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/?retryWrites=true&w=majority&appName=${process.env.DB_NAME}`
 	)
 	.then(() => console.log('Database OK'))
 	.catch(err => console.log('Database error: ', err))
@@ -23,10 +24,11 @@ app.post('/auth/register', registerValidation, UserController.register)
 app.get('/dashboard', checkAuth, (req, res) => {
 	const { role } = req.userData
 
-	role === 'admin' ? res.send('Admin') : res.send('Dashboard')
+	res.json({ role: role })
 })
 
-app.listen(8000, err => {
+const PORT = process.env.PORT
+app.listen(PORT, err => {
 	if (err) {
 		return console.log(err)
 	}

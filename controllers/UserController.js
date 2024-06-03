@@ -1,8 +1,13 @@
 import bcrypt from 'bcrypt'
+import 'dotenv/config'
 import { validationResult } from 'express-validator'
 import jwt from 'jsonwebtoken'
 
 import UserModel from '../models/User.js'
+
+const JWT_SECRET = process.env.JWT_SECRET
+const JWT_EXPIRATION = process.env.JWT_EXPIRATION
+const COOKIE_SECURE = process.env.COOKIE_SECURE === 'true'
 
 export const register = async (req, res) => {
 	try {
@@ -26,15 +31,17 @@ export const register = async (req, res) => {
 
 		const user = await doc.save()
 
-		const token = jwt.sign({ _id: user._id, role: user.role }, 'secret123', {
-			expiresIn: '30d',
+		const token = jwt.sign({ _id: user._id, role: user.role }, JWT_SECRET, {
+			expiresIn: JWT_EXPIRATION,
 		})
 
 		res.cookie('token', token, {
 			httpOnly: true,
-			secure: true,
+			secure: COOKIE_SECURE,
 			maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
 		})
+
+		console.log('Token:', token)
 
 		const { passwordHash, ...userData } = user._doc
 
@@ -50,7 +57,7 @@ export const login = async (req, res) => {
 		const user = await UserModel.findOne({ email: req.body.email })
 
 		if (!user) {
-			return req.status(404).json({ message: 'User not found' })
+			return res.status(404).json({ message: 'User not found' })
 		}
 
 		const isValidPass = await bcrypt.compare(
@@ -62,13 +69,13 @@ export const login = async (req, res) => {
 			return res.status(400).json({ message: 'Invalid login or password' })
 		}
 
-		const token = jwt.sign({ _id: user._id, role: user.role }, 'secret123', {
-			expiresIn: '30d',
+		const token = jwt.sign({ _id: user._id, role: user.role }, JWT_SECRET, {
+			expiresIn: JWT_EXPIRATION,
 		})
 
 		res.cookie('token', token, {
 			httpOnly: true,
-			secure: true,
+			secure: COOKIE_SECURE,
 			maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
 		})
 
