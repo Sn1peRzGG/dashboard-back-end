@@ -31,3 +31,12 @@ export const registerValidation = [
 		.isLength({ min: 8, max: 16 })
 		.matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])/),
 ]
+
+export const postCreateValidation = [
+	body('title', 'Enter the title of the article')
+		.isLength({ min: 3 })
+		.isString(),
+	body('text', 'Enter article text').isLength({ min: 3 }).isString(),
+	body('tags', 'Invalid tag format').optional().isString(),
+	body('imageUrl', 'Invalid image link').optional().isString(),
+]

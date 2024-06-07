@@ -1,7 +1,12 @@
 import mongoose from 'mongoose'
+import { v4 as uuidv4 } from 'uuid'
 
 const UserSchema = new mongoose.Schema(
 	{
+		_id: {
+			type: String,
+			default: uuidv4,
+		},
 		firstName: {
 			type: String,
 			required: true,
@@ -29,8 +34,6 @@ const UserSchema = new mongoose.Schema(
 		},
 		role: {
 			type: String,
-			enum: ['admin', 'user'],
-			required: true,
 			default: 'user',
 		},
 		avatarUrl: {
@@ -39,9 +42,7 @@ const UserSchema = new mongoose.Schema(
 				'https://t3.ftcdn.net/jpg/05/53/79/60/360_F_553796090_XHrE6R9jwmBJUMo9HKl41hyHJ5gqt9oz.jpg',
 		},
 	},
-	{
-		timestamps: true,
-	}
+	{ timestamps: true }
 )
 
 export default mongoose.model('User', UserSchema)

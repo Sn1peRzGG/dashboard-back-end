@@ -41,8 +41,6 @@ export const register = async (req, res) => {
 			maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
 		})
 
-		console.log('Token:', token)
-
 		const { passwordHash, ...userData } = user._doc
 
 		res.json({ ...userData, token })
@@ -85,5 +83,26 @@ export const login = async (req, res) => {
 	} catch (err) {
 		console.log(err)
 		res.status(500).json({ message: 'Login failed' })
+	}
+}
+
+export const getMe = async (req, res) => {
+	try {
+		const user = await UserModel.findById(req.userId)
+
+		if (!user) {
+			return res.status(404).json({
+				message: 'User not found',
+			})
+		}
+
+		const { passwordHash, ...userData } = user._doc
+
+		res.json(userData)
+	} catch (err) {
+		console.log(err)
+		res.status(500).json({
+			message: 'No access',
+		})
 	}
 }
